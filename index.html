@@ -1,0 +1,1388 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lower Zambezi Birds Checklist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Playfair+Display+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background-color: #f5f7fa;
+            padding: 16px;
+            color: #1a1a1a;
+        }
+
+        .checklist {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .checklist-title {
+            font-family: 'Playfair Display SC', serif;
+            font-size: 28px;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .sightings-counter {
+            text-align: center;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+
+        .class-counters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .class-counter {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .sightings-text {
+            font-family: 'Playfair Display SC', serif;
+            font-size: 16px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .sightings-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #060054;
+        }
+
+        .checklist-item {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: white;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .checklist-item:active {
+            transform: scale(0.98);
+        }
+
+        .checklist-item.completed::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(6, 0, 84, 0.1);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .checkbox-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            flex-shrink: 0;
+            z-index: 2;
+            width: 24px;
+        }
+
+        .checkbox-wrapper {
+            position: relative;
+            width: 24px;
+            height: 24px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 2;
+            margin: 0;
+            pointer-events: none;
+        }
+
+        .checkbox-wrapper .checkbox-custom {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #060054;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked + .checkbox-custom {
+            background-color: #060054;
+            border-color: #060054;
+        }
+
+        .checkbox-wrapper .checkbox-custom::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://cmsphoto.ww-cdn.com/superstatic/4048636/gal/pic/gal-27999657.jpg?v=1737539984');
+            background-size: 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked + .checkbox-custom::after {
+            opacity: 1;
+        }
+
+        .spotted-text {
+            font-family: 'Playfair Display SC', serif;
+            font-size: 6px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .checklist-item.completed .spotted-text {
+            opacity: 1;
+        }
+
+        .checklist-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 1;
+            min-width: 0;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .species-info {
+            display: flex;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .species-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .species-image {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .species-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a1a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .species-name a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .species-name a:hover {
+            color: #060054;
+        }
+
+        .species-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+
+        .tag {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 1px 6px;
+            border-radius: 12px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .tag-class {
+            color: #7c3aed;
+            background: #f3e8ff;
+        }
+
+        .tag-type {
+            color: #ea580c;
+            background: #fff7ed;
+        }
+
+        .more-info-btn {
+            background-color: #060054;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            z-index: 2;
+            align-self: center;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .more-info-btn:hover {
+            background-color: #0a0066;
+            transform: translateY(-1px);
+        }
+
+        .more-info-btn:active {
+            transform: translateY(0);
+        }
+
+        .checklist-item.completed {
+            background-color: #f8fafc;
+        }
+
+        .checklist-item.completed .species-name {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+
+        .special-class {
+            border-left: 4px solid #2563eb;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 40px auto;
+            padding: 24px;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display SC', serif;
+            font-size: 32px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .modal-scientific {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 20px;
+            color: #666;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .modal-description {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 24px;
+        }
+
+        .modal-tags {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            padding: 8px;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #1a1a1a;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .rating-label {
+            font-family: 'Playfair Display SC', serif;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .rating-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #060054;
+        }
+
+        /* Add new styles for search and filter */
+        .search-filter-container {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            margin-bottom: 12px;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #060054;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            flex: 1;
+            min-width: 120px;
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #060054;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 24px;
+            background: white;
+            border-radius: 8px;
+            font-family: 'Playfair Display', serif;
+            color: #666;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .checklist-item {
+                padding: 8px;
+            }
+
+            .more-info-btn {
+                padding: 4px 10px;
+                font-size: 12px;
+            }
+
+            .modal-content {
+                margin: 20px;
+                padding: 16px;
+            }
+
+            .modal-title {
+                font-size: 24px;
+            }
+
+            .modal-scientific {
+                font-size: 16px;
+            }
+
+            .modal-image {
+                height: 300px;
+            }
+
+            .modal-description {
+                font-size: 16px;
+            }
+        }
+
+        /* Add print-specific styles */
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .search-filter-container,
+            .export-container {
+                display: none;
+            }
+
+            .checklist-item {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                background: white;
+                box-shadow: none;
+                border: 1px solid #eee;
+            }
+        }
+
+        /* Add these styles in the existing <style> section */
+        .export-container {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .export-btn {
+            background-color: #060054;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .export-btn:hover {
+            background-color: #0a0066;
+            transform: translateY(-1px);
+        }
+
+        .export-btn:active {
+            transform: translateY(0);
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #060054;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        .loading-text {
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Update export button for better mobile support */
+        .export-btn {
+            min-height: 44px;
+            min-width: 100px;
+            padding: 8px 20px;
+            font-size: 16px;
+            touch-action: manipulation;
+        }
+
+        /* Page Loader Styles */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .page-loader.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .page-loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #e2e8f0;
+            border-top: 6px solid #060054;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        .page-loading-text {
+            font-family: 'Playfair Display SC', serif;
+            font-size: 24px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .page-loading-subtext {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            max-width: 300px;
+            line-height: 1.4;
+        }
+
+        /* PDF Export Improvements */
+        @media print {
+            .checklist-item {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                background: white;
+                box-shadow: none;
+                border: 1px solid #eee;
+            }
+            
+            .search-filter-container,
+            .export-container {
+                display: none;
+            }
+        }
+    </style>
+    <!-- Add this in the <head> section, after the existing styles -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Generating PDF...</div>
+    </div>
+
+    <div id="pageLoader" class="page-loader">
+        <div class="page-loading-spinner"></div>
+        <div class="page-loading-text">Loading Bird Checklist...</div>
+        <div class="page-loading-subtext">Please wait while we prepare your checklist</div>
+    </div>
+
+    <div class="checklist" id="mainContent" style="display: none;">
+        <div class="sightings-counter">
+            <h1 class="checklist-title">Lower Zambezi Bird Checklist</h1>
+            <div class="sightings-text">Birds Spotted</div>
+            <div class="sightings-number">0</div>
+            <div class="class-counters" id="class-breakdown"></div>
+        </div>
+
+        <div class="search-filter-container">
+            <input type="text" 
+                   class="search-box" 
+                   placeholder="Search birds..."
+                   id="searchInput">
+            <div class="filter-options">
+                <select class="filter-select" id="classFilter">
+                    <option value="">All Families</option>
+                </select>
+            </div>
+            <!-- Add this in the search-filter-container div, after the filter-options div -->
+            <div class="export-container">
+                <button id="exportPdf" class="export-btn">Export PDF</button>
+            </div>
+        </div>
+
+        <div id="checklist-container">
+            <!-- JavaScript will populate this container -->
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="animalModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title"></h2>
+                <div class="modal-scientific"></div>
+            </div>
+            <div class="rating-display">
+                <span class="rating-label">Plate Number:</span>
+                <span class="rating-value"></span>
+            </div>
+            <div class="modal-tags"></div>
+        </div>
+    </div>
+
+    <script>
+const birds = [
+  { spotted: false, id: '1', family: 'Grouse, Quail, and Allies', species: 'Crested Francolin', plateNumber: 189 },
+  { spotted: false, id: '2', family: 'Grouse, Quail, and Allies', species: 'Natal Spurfowl', plateNumber: 196 },
+  { spotted: false, id: '3', family: 'Grouse, Quail, and Allies', species: 'Red-necked Spurfowl', plateNumber: 198 },
+  { spotted: false, id: '4', family: 'Grouse, Quail, and Allies', species: "Swainson's Spurfowl", plateNumber: 199 },
+  { spotted: false, id: '5', family: 'Grouse, Quail, and Allies', species: 'Southern Crested Guineafowl', plateNumber: 204 },
+  { spotted: false, id: '6', family: 'Grouse, Quail, and Allies', species: 'Helmeted Guineafowl', plateNumber: 203 },
+  { spotted: false, id: '7', family: 'Waterfowl', species: 'White-faced Whistling-Duck', plateNumber: 99 },
+  { spotted: false, id: '8', family: 'Waterfowl', species: 'White-backed Duck', plateNumber: 101 },
+  { spotted: false, id: '9', family: 'Waterfowl', species: 'Egyptian Goose', plateNumber: 102 },
+  { spotted: false, id: '10', family: 'Waterfowl', species: 'Spur-winged Goose', plateNumber: 116 },
+  { spotted: false, id: '11', family: 'Waterfowl', species: 'Knob-billed Duck', plateNumber: 115 },
+  { spotted: false, id: '12', family: 'Waterfowl', species: 'African Pygmy-Goose', plateNumber: 114 },
+  { spotted: false, id: '13', family: 'Waterfowl', species: 'Yellow-billed Duck', plateNumber: 104 },
+  { spotted: false, id: '14', family: 'Waterfowl', species: 'Red-billed Duck', plateNumber: 108 },
+  { spotted: false, id: '15', family: 'Waterfowl', species: 'Blue-billed Teal', plateNumber: 107 },
+  { spotted: false, id: '16', family: 'Waterfowl', species: 'Southern Pochard', plateNumber: 113 },
+  { spotted: false, id: '17', family: 'Honeyguides', species: 'Greater Honeyguide', plateNumber: 474 },
+  { spotted: false, id: '18', family: 'Honeyguides', species: 'Lesser Honeyguide', plateNumber: 476 },
+  { spotted: false, id: '19', family: 'Woodpeckers', species: "Bennett's Woodpecker", plateNumber: 481 },
+  { spotted: false, id: '20', family: 'Woodpeckers', species: 'Golden-tailed Woodpecker', plateNumber: 483 },
+  { spotted: false, id: '21', family: 'Woodpeckers', species: 'Green-backed Woodpecker', plateNumber: 485 },
+  { spotted: false, id: '22', family: 'Woodpeckers', species: 'Cardinal Woodpecker', plateNumber: 486 },
+  { spotted: false, id: '23', family: 'Woodpeckers', species: 'Bearded Woodpecker', plateNumber: 487 },
+  { spotted: false, id: '24', family: 'Barbets and Toucans', species: 'Yellow-fronted Tinkerbird', plateNumber: 470 },
+  { spotted: false, id: '25', family: 'Barbets and Toucans', species: 'Black-collared Barbet', plateNumber: 464 },
+  { spotted: false, id: '26', family: 'Barbets and Toucans', species: 'Crested Barbet', plateNumber: 473 },
+  { spotted: false, id: '27', family: 'Hornbills', species: 'Southern Red-billed Hornbill', plateNumber: 458 },
+  { spotted: false, id: '28', family: 'Hornbills', species: 'Southern Yellow-billed Hornbill', plateNumber: 459 },
+  { spotted: false, id: '29', family: 'Hornbills', species: 'Crowned Hornbill', plateNumber: 460 },
+  { spotted: false, id: '30', family: 'Hornbills', species: 'African Gray Hornbill', plateNumber: 457 },
+  { spotted: false, id: '31', family: 'Hornbills', species: 'Trumpeter Hornbill', plateNumber: 455 },
+  { spotted: false, id: '32', family: 'Hornbills', species: 'Southern Ground-Hornbill', plateNumber: 463 },
+  { spotted: false, id: '33', family: 'Woodhoopoes and Scimitarbills', species: 'Green Wood-Hoopoe', plateNumber: 452 },
+  { spotted: false, id: '34', family: 'Woodhoopoes and Scimitarbills', species: 'Common Scimitarbill', plateNumber: 454 },
+  { spotted: false, id: '35', family: 'Trogons and Quetzals', species: 'Narina Trogon', plateNumber: 427 },
+  { spotted: false, id: '36', family: 'Rollers and Allies', species: 'European Roller', plateNumber: 446 },
+  { spotted: false, id: '37', family: 'Rollers and Allies', species: 'Lilac-breasted Roller', plateNumber: 447 },
+  { spotted: false, id: '38', family: 'Rollers and Allies', species: 'Racket-tailed Roller', plateNumber: 448 },
+  { spotted: false, id: '39', family: 'Rollers and Allies', species: 'Broad-billed Roller', plateNumber: 450 },
+  { spotted: false, id: '40', family: 'Kingfishers', species: 'Half-collared Kingfisher', plateNumber: 430 },
+  { spotted: false, id: '41', family: 'Kingfishers', species: 'Malachite Kingfisher', plateNumber: 431 },
+  { spotted: false, id: '42', family: 'Kingfishers', species: 'Gray-headed Kingfisher', plateNumber: 436 },
+  { spotted: false, id: '43', family: 'Kingfishers', species: 'Woodland Kingfisher', plateNumber: 433 },
+  { spotted: false, id: '44', family: 'Kingfishers', species: 'Brown-hooded Kingfisher', plateNumber: 435 },
+  { spotted: false, id: '45', family: 'Kingfishers', species: 'Striped Kingfisher', plateNumber: 437 },
+  { spotted: false, id: '46', family: 'Kingfishers', species: 'Giant Kingfisher', plateNumber: 429 },
+  { spotted: false, id: '47', family: 'Kingfishers', species: 'Pied Kingfisher', plateNumber: 428 },
+  { spotted: false, id: '48', family: 'Bee-eaters', species: 'White-fronted Bee-eater', plateNumber: 443 },
+  { spotted: false, id: '49', family: 'Bee-eaters', species: 'Little Bee-eater', plateNumber: 444 },
+  { spotted: false, id: '50', family: 'Bee-eaters', species: 'Swallow-tailed Bee-eater', plateNumber: 445 },
+  { spotted: false, id: '51', family: 'Bee-eaters', species: 'Blue-cheeked Bee-eater', plateNumber: 440 },
+  { spotted: false, id: '52', family: 'Bee-eaters', species: 'European Bee-eater', plateNumber: 438 },
+  { spotted: false, id: '53', family: 'Bee-eaters', species: 'Southern Carmine Bee-eater', plateNumber: 441 },
+  { spotted: false, id: '54', family: 'Mousebirds', species: 'Red-faced Mousebird', plateNumber: 426 },
+  { spotted: false, id: '55', family: 'Cuckoos', species: 'Pied Cuckoo', plateNumber: 382 },
+  { spotted: false, id: '56', family: 'Cuckoos', species: "Levaillant's Cuckoo", plateNumber: 381 },
+  { spotted: false, id: '57', family: 'Cuckoos', species: 'Red-chested Cuckoo', plateNumber: 377 },
+  { spotted: false, id: '58', family: 'Cuckoos', species: 'Black Cuckoo', plateNumber: 378 },
+  { spotted: false, id: '59', family: 'Cuckoos', species: "Klaas's Cuckoo", plateNumber: 385 },
+  { spotted: false, id: '60', family: 'Cuckoos', species: 'African Emerald Cuckoo', plateNumber: 384 },
+  { spotted: false, id: '61', family: 'Cuckoos', species: 'Dideric Cuckoo', plateNumber: 386 },
+  { spotted: false, id: '62', family: 'Cuckoos', species: 'Coppery-tailed Coucal', plateNumber: 389 },
+  { spotted: false, id: '63', family: 'Cuckoos', species: 'Senegal Coucal', plateNumber: 390 },
+  { spotted: false, id: '64', family: 'Cuckoos', species: 'White-browed Coucal', plateNumber: 0 },
+  { spotted: false, id: '65', family: 'Cuckoos', species: "White-browed/Burchell's Coucal", plateNumber: 391 },
+  { spotted: false, id: '66', family: 'Parrots, Parakeets, and Allies', species: 'Brown-necked Parrot', plateNumber: 363 },
+  { spotted: false, id: '67', family: 'Parrots, Parakeets, and Allies', species: "Meyer's Parrot", plateNumber: 364 },
+  { spotted: false, id: '68', family: 'Parrots, Parakeets, and Allies', species: "Lilian's Lovebird", plateNumber: 368 },
+  { spotted: false, id: '69', family: 'Swifts', species: 'Bat-like Spinetail', plateNumber: 423 },
+  { spotted: false, id: '70', family: 'Swifts', species: 'African Palm-Swift', plateNumber: 421 },
+  { spotted: false, id: '71', family: 'Swifts', species: 'Common Swift', plateNumber: 411 },
+  { spotted: false, id: '72', family: 'Swifts', species: 'Little Swift', plateNumber: 417 },
+  { spotted: false, id: '73', family: 'Swifts', species: 'Horus Swift', plateNumber: 416 },
+  { spotted: false, id: '74', family: 'Swifts', species: 'White-rumped Swift', plateNumber: 415 },
+  { spotted: false, id: '75', family: 'Turacos', species: 'Purple-crested Turaco', plateNumber: 371 },
+  { spotted: false, id: '76', family: 'Turacos', species: 'Grey Go-away-bird', plateNumber: 373 },
+  { spotted: false, id: '77', family: 'Owls', species: 'Western Barn Owl', plateNumber: 392 },
+  { spotted: false, id: '78', family: 'Owls', species: 'African Scops-Owl', plateNumber: 396 },
+  { spotted: false, id: '79', family: 'Owls', species: 'Spotted Eagle-Owl', plateNumber: 401 },
+  { spotted: false, id: '80', family: 'Owls', species: "Verreaux's Eagle-Owl", plateNumber: 402 },
+  { spotted: false, id: '81', family: 'Owls', species: 'African Wood-Owl', plateNumber: 394 },
+  { spotted: false, id: '82', family: 'Owls', species: 'Pearl-spotted Owlet', plateNumber: 398 },
+  { spotted: false, id: '83', family: 'Nightjars', species: 'Fiery-necked Nightjar', plateNumber: 405 },
+  { spotted: false, id: '84', family: 'Nightjars', species: 'Freckled Nightjar', plateNumber: 408 },
+  { spotted: false, id: '85', family: 'Nightjars', species: 'Square-tailed Nightjar', plateNumber: 409 },
+  { spotted: false, id: '86', family: 'Nightjars', species: 'Pennant-winged Nightjar', plateNumber: 410 },
+  { spotted: false, id: '87', family: 'Pigeons and Doves', species: 'Rock Pigeon', plateNumber: 348 },
+  { spotted: false, id: '88', family: 'Pigeons and Doves', species: 'Laughing Dove', plateNumber: 355 },
+  { spotted: false, id: '89', family: 'Pigeons and Doves', species: 'Mourning Collared-Dove', plateNumber: 353 },
+  { spotted: false, id: '90', family: 'Cranes', species: 'Grey Crowned-Crane', plateNumber: 353 },
+  { spotted: false, id: '91', family: 'Pigeons and Doves', species: 'Ring-necked Dove', plateNumber: 354 },
+  { spotted: false, id: '92', family: 'Pigeons and Doves', species: 'Red-eyed Dove', plateNumber: 352 },
+  { spotted: false, id: '93', family: 'Pigeons and Doves', species: 'Emerald-spotted Wood-Dove', plateNumber: 358 },
+  { spotted: false, id: '94', family: 'Pigeons and Doves', species: 'Tambourine Dove', plateNumber: 359 },
+  { spotted: false, id: '95', family: 'Pigeons and Doves', species: 'Namaqua Dove', plateNumber: 356 },
+  { spotted: false, id: '96', family: 'Pigeons and Doves', species: 'African Green-Pigeon', plateNumber: 361 },
+  { spotted: false, id: '97', family: 'Bustards', species: 'Black-bellied Bustard', plateNumber: 238 },
+  { spotted: false, id: '98', family: 'Finfoots', species: 'African Finfoot', plateNumber: 229 },
+  { spotted: false, id: '99', family: 'Flufftails', species: 'Red-chested Flufftail', plateNumber: 217 },
+  { spotted: false, id: '100', family: 'Rails, Gallinules, and Allies', species: 'Black Crake', plateNumber: 213 },
+  { spotted: false, id: '101', family: 'Waterfowl', species: 'Fulvous Whistling-Duck', plateNumber: 223 },
+  { spotted: false, id: '102', family: 'Rails, Gallinules, and Allies', species: 'African Swamphen', plateNumber: 223 },
+  { spotted: false, id: '103', family: 'Rails, Gallinules, and Allies', species: 'Eurasian Moorhen', plateNumber: 226 },
+  { spotted: false, id: '104', family: 'Sandgrouse', species: 'Double-banded Sandgrouse', plateNumber: 347 },
+  { spotted: false, id: '105', family: 'Shorebirds', species: 'African Snipe', plateNumber: 286 },
+  { spotted: false, id: '106', family: 'Shorebirds', species: 'Marsh Sandpiper', plateNumber: 269 },
+  { spotted: false, id: '107', family: 'Shorebirds', species: 'Common Greenshank', plateNumber: 270 },
+  { spotted: false, id: '108', family: 'Shorebirds', species: 'Wood Sandpiper', plateNumber: 266 },
+  { spotted: false, id: '109', family: 'Shorebirds', species: 'Common Sandpiper', plateNumber: 264 },
+  { spotted: false, id: '110', family: 'Shorebirds', species: 'Little Stint', plateNumber: 274 },
+  { spotted: false, id: '111', family: 'Shorebirds', species: 'Curlew Sandpiper', plateNumber: 272 },
+  { spotted: false, id: '112', family: 'Shorebirds', species: 'Ruff', plateNumber: 284 },
+  { spotted: false, id: '113', family: 'Shorebirds', species: 'Greater Painted-Snipe', plateNumber: 242 },
+  { spotted: false, id: '114', family: 'Shorebirds', species: 'African Jacana', plateNumber: 240 },
+  { spotted: false, id: '115', family: 'Shorebirds', species: 'Lesser Jacana', plateNumber: 241 },
+  { spotted: false, id: '116', family: 'Shorebirds', species: 'Water Thick-knee', plateNumber: 298 },
+  { spotted: false, id: '117', family: 'Shorebirds', species: 'Black-winged Stilt', plateNumber: 295 },
+  { spotted: false, id: '118', family: 'Shorebirds', species: 'Common Ringed Plover', plateNumber: 245 },
+  { spotted: false, id: '119', family: 'Shorebirds', species: "Kittlitz's Plover", plateNumber: 248 },
+  { spotted: false, id: '120', family: 'Shorebirds', species: 'Three-banded Plover', plateNumber: 249 },
+  { spotted: false, id: '121', family: 'Shorebirds', species: 'White-fronted Plover', plateNumber: 246 },
+  { spotted: false, id: '122', family: 'Shorebirds', species: 'Long-toed Lapwing', plateNumber: 261 },
+  { spotted: false, id: '123', family: 'Shorebirds', species: 'Blacksmith Lapwing', plateNumber: 258 },
+  { spotted: false, id: '124', family: 'Shorebirds', species: 'White-crowned Lapwing', plateNumber: 259 },
+  { spotted: false, id: '125', family: 'Shorebirds', species: 'Wattled Lapwing', plateNumber: 260 },
+  { spotted: false, id: '126', family: 'Shorebirds', species: 'Crowned Lapwing', plateNumber: 255 },
+  { spotted: false, id: '127', family: 'Shorebirds', species: 'Bronze-winged Courser', plateNumber: 303 },
+  { spotted: false, id: '128', family: 'Shorebirds', species: 'Three-banded Courser', plateNumber: 302 },
+  { spotted: false, id: '129', family: 'Shorebirds', species: "Temminck's Courser", plateNumber: 300 },
+  { spotted: false, id: '130', family: 'Shorebirds', species: 'Collared Pratincole', plateNumber: 304 },
+  { spotted: false, id: '131', family: 'Gulls, Terns, and Skimmers', species: 'African Skimmer', plateNumber: 343 },
+  { spotted: false, id: '132', family: 'Gulls, Terns, and Skimmers', species: 'Grey-headed Gull', plateNumber: 315 },
+  { spotted: false, id: '133', family: 'Gulls, Terns, and Skimmers', species: 'Whiskered Tern', plateNumber: 338 },
+  { spotted: false, id: '134', family: 'Vultures, Hawks, and Allies', species: 'Osprey', plateNumber: 170 },
+  { spotted: false, id: '135', family: 'Birds of Prey', species: 'African Cuckoo-Hawk', plateNumber: 128 },
+  { spotted: false, id: '136', family: 'Birds of Prey', species: 'Bat Hawk', plateNumber: 129 },
+  { spotted: false, id: '137', family: 'Birds of Prey', species: 'Black-winged Kite', plateNumber: 127 },
+  { spotted: false, id: '138', family: 'Birds of Prey', species: 'Black Kite', plateNumber: 126 },
+  { spotted: false, id: '139', family: 'Birds of Prey', species: 'African Fish-Eagle', plateNumber: 148 },
+  { spotted: false, id: '140', family: 'Birds of Prey', species: 'Palm-nut Vulture', plateNumber: 147 },
+  { spotted: false, id: '141', family: 'Birds of Prey', species: 'Hooded Vulture', plateNumber: 121 },
+  { spotted: false, id: '142', family: 'Birds of Prey', species: 'White-backed Vulture', plateNumber: 123 },
+  { spotted: false, id: '143', family: 'Birds of Prey', species: 'Lappet-faced Vulture', plateNumber: 124 },
+  { spotted: false, id: '144', family: 'Birds of Prey', species: 'White-headed Vulture', plateNumber: 125 },
+  { spotted: false, id: '145', family: 'Birds of Prey', species: 'Black-chested Snake-Eagle', plateNumber: 143 },
+  { spotted: false, id: '146', family: 'Birds of Prey', species: 'Brown Snake-Eagle', plateNumber: 142 },
+  { spotted: false, id: '147', family: 'Birds of Prey', species: 'Western Banded Snake-Eagle', plateNumber: 145 },
+  { spotted: false, id: '148', family: 'Birds of Prey', species: 'Bateleur', plateNumber: 146 },
+  { spotted: false, id: '149', family: 'Birds of Prey', species: 'African Marsh Harrier', plateNumber: 165 },
+  { spotted: false, id: '150', family: 'Birds of Prey', species: 'African Harrier-Hawk', plateNumber: 169 },
+  { spotted: false, id: '151', family: 'Birds of Prey', species: 'Lizard Buzzard', plateNumber: 154 },
+  { spotted: false, id: '152', family: 'Birds of Prey', species: 'Dark Chanting-Goshawk', plateNumber: 163 },
+  { spotted: false, id: '153', family: 'Birds of Prey', species: 'Gabar Goshawk', plateNumber: 161 },
+  { spotted: false, id: '154', family: 'Birds of Prey', species: 'African Goshawk', plateNumber: 160 },
+  { spotted: false, id: '155', family: 'Birds of Prey', species: 'Shikra', plateNumber: 159 },
+  { spotted: false, id: '156', family: 'Birds of Prey', species: 'Little Sparrowhawk', plateNumber: 157 },
+  { spotted: false, id: '157', family: 'Birds of Prey', species: 'Ovambo Sparrowhawk', plateNumber: 156 },
+  { spotted: false, id: '158', family: 'Birds of Prey', species: 'Tawny Eagle', plateNumber: 132 },
+  { spotted: false, id: '159', family: 'Birds of Prey', species: "Verreaux's Eagle", plateNumber: 131 },
+  { spotted: false, id: '160', family: 'Birds of Prey', species: 'African Hawk-Eagle', plateNumber: 137 },
+  { spotted: false, id: '161', family: 'Birds of Prey', species: "Ayres's Hawk-Eagle", plateNumber: 138 },
+  { spotted: false, id: '162', family: 'Birds of Prey', species: "Wahlberg's Eagle", plateNumber: 135 },
+  { spotted: false, id: '163', family: 'Birds of Prey', species: 'Martial Eagle', plateNumber: 140 },
+  { spotted: false, id: '164', family: 'Birds of Prey', species: 'Long-crested Eagle', plateNumber: 139 },
+  { spotted: false, id: '165', family: 'Birds of Prey', species: 'Crowned Eagle', plateNumber: 141 },
+  { spotted: false, id: '166', family: 'Vultures, Hawks, and Allies', species: 'Secretarybird', plateNumber: 118 },
+  { spotted: false, id: '167', family: 'Falcons and Caracaras', species: "Dickinson's Kestrel", plateNumber: 185 },
+  { spotted: false, id: '168', family: 'Falcons and Caracaras', species: 'Red-necked Falcon', plateNumber: 178 },
+  { spotted: false, id: '169', family: 'Falcons and Caracaras', species: 'Red-footed Falcon', plateNumber: 179 },
+  { spotted: false, id: '170', family: 'Falcons and Caracaras', species: 'Eurasian Hobby', plateNumber: 173 },
+  { spotted: false, id: '171', family: 'Falcons and Caracaras', species: 'Lanner Falcon', plateNumber: 172 },
+  { spotted: false, id: '172', family: 'Grebes', species: 'Little Grebe', plateNumber: 8 },
+  { spotted: false, id: '173', family: 'Cormorants and Anhingas', species: 'African Darter', plateNumber: 60 },
+  { spotted: false, id: '174', family: 'Cormorants and Anhingas', species: 'Reed Cormorant', plateNumber: 58 },
+  { spotted: false, id: '175', family: 'Herons, Ibis, and Allies', species: 'Slaty Egret', plateNumber: 70 },
+  { spotted: false, id: '176', family: 'Herons, Ibis, and Allies', species: 'Black Heron', plateNumber: 69 },
+  { spotted: false, id: '177', family: 'Herons, Ibis, and Allies', species: 'Little Egret', plateNumber: 67 },
+  { spotted: false, id: '178', family: 'Herons, Ibis, and Allies', species: 'Yellow-billed Egret', plateNumber: 68 },
+  { spotted: false, id: '179', family: 'Herons, Ibis, and Allies', species: 'Great Egret', plateNumber: 66 },
+  { spotted: false, id: '180', family: 'Herons, Ibis, and Allies', species: 'Grey Heron', plateNumber: 62 },
+  { spotted: false, id: '181', family: 'Herons, Ibis, and Allies', species: 'Black-headed Heron', plateNumber: 63 },
+  { spotted: false, id: '182', family: 'Herons, Ibis, and Allies', species: 'Goliath Heron', plateNumber: 64 },
+  { spotted: false, id: '183', family: 'Herons, Ibis, and Allies', species: 'Purple Heron', plateNumber: 65 },
+  { spotted: false, id: '184', family: 'Herons, Ibis, and Allies', species: 'Western Cattle-Egret', plateNumber: 71 },
+  { spotted: false, id: '185', family: 'Herons, Ibis, and Allies', species: 'Squacco Heron', plateNumber: 72 },
+  { spotted: false, id: '186', family: 'Herons, Ibis, and Allies', species: 'Rufous-bellied Heron', plateNumber: 75 },
+  { spotted: false, id: '187', family: 'Herons, Ibis, and Allies', species: 'Striated Heron', plateNumber: 74 },
+  { spotted: false, id: '188', family: 'Herons, Ibis, and Allies', species: 'Black-crowned Night Heron', plateNumber: 76 },
+  { spotted: false, id: '189', family: 'Herons, Ibis, and Allies', species: 'White-backed Night Heron', plateNumber: 77 },
+  { spotted: false, id: '190', family: 'Herons, Ibis, and Allies', species: 'Little Bittern', plateNumber: 78 },
+  { spotted: false, id: '191', family: 'Herons, Ibis, and Allies', species: 'Dwarf Bittern', plateNumber: 79 },
+  { spotted: false, id: '192', family: 'Shoebill and Hammerkop', species: 'Hamerkop', plateNumber: 81 },
+  { spotted: false, id: '193', family: 'Flamingos', species: 'Greater Flamingo', plateNumber: 96 },
+  { spotted: false, id: '194', family: 'Herons, Ibis, and Allies', species: 'Glossy Ibis', plateNumber: 93 },
+  { spotted: false, id: '195', family: 'Herons, Ibis, and Allies', species: 'Hadeda Ibis', plateNumber: 94 },
+  { spotted: false, id: '196', family: 'Herons, Ibis, and Allies', species: 'African Sacred Ibis', plateNumber: 91 },
+  { spotted: false, id: '197', family: 'Herons, Ibis, and Allies', species: 'African Spoonbill', plateNumber: 95 },
+  { spotted: false, id: '198', family: 'Pelicans', species: 'Great White Pelican', plateNumber: 49 },
+  { spotted: false, id: '199', family: 'Storks', species: 'Yellow-billed Stork', plateNumber: 90 },
+  { spotted: false, id: '200', family: 'Storks', species: 'African Openbill', plateNumber: 87 },
+  { spotted: false, id: '201', family: 'Storks', species: 'Black Stork', plateNumber: 84 },
+  { spotted: false, id: '202', family: 'Storks', species: "Abdim's Stork", plateNumber: 85 },
+  { spotted: false, id: '203', family: 'Storks', species: 'African Woolly-necked Stork', plateNumber: 86 },
+  { spotted: false, id: '204', family: 'Storks', species: 'White Stork', plateNumber: 83 },
+  { spotted: false, id: '205', family: 'Storks', species: 'Saddle-billed Stork', plateNumber: 88 },
+  { spotted: false, id: '206', family: 'Storks', species: 'Marabou Stork', plateNumber: 89 },
+  { spotted: false, id: '207', family: 'Old World Pittas', species: 'African Pitta', plateNumber: 491 },
+  { spotted: false, id: '208', family: 'African and Green Broadbills', species: 'African Broadbill', plateNumber: 490 },
+  { spotted: false, id: '209', family: 'Old World Orioles', species: 'African Golden Oriole', plateNumber: 544 },
+  { spotted: false, id: '210', family: 'Old World Orioles', species: 'African Black-headed Oriole', plateNumber: 545 },
+  { spotted: false, id: '211', family: 'Drongos', species: 'Fork-tailed Drongo', plateNumber: 541 },
+  { spotted: false, id: '212', family: 'Monarch Flycatchers', species: 'African Paradise-Flycatcher', plateNumber: 710 },
+  { spotted: false, id: '213', family: 'Bushshrikes and Allies', species: 'Brubru', plateNumber: 741 },
+  { spotted: false, id: '214', family: 'Bushshrikes and Allies', species: 'Black-backed Puffback', plateNumber: 740 },
+  { spotted: false, id: '215', family: 'Bushshrikes and Allies', species: 'Black-crowned Tchagra', plateNumber: 744 },
+  { spotted: false, id: '216', family: 'Bushshrikes and Allies', species: 'Brown-crowned Tchagra', plateNumber: 743 },
+  { spotted: false, id: '217', family: 'Bushshrikes and Allies', species: 'Tropical Boubou', plateNumber: 737 },
+  { spotted: false, id: '218', family: 'Bushshrikes and Allies', species: 'Sulphur-breasted Bushshrike', plateNumber: 748 },
+  { spotted: false, id: '219', family: 'Bushshrikes and Allies', species: 'Gray-headed Bushshrike', plateNumber: 751 },
+  { spotted: false, id: '220', family: 'Vangas, Helmetshrikes, and Allies', species: 'White-crested Helmetshrike', plateNumber: 753 },
+  { spotted: false, id: '221', family: 'Vangas, Helmetshrikes, and Allies', species: "Retz's Helmetshrike", plateNumber: 754 },
+  { spotted: false, id: '222', family: 'Wattle-eyes and Batises', species: 'Chinspot Batis', plateNumber: 701 },
+  { spotted: false, id: '223', family: 'Wattle-eyes and Batises', species: 'Black-throated Wattle-eye', plateNumber: 705 },
+  { spotted: false, id: '224', family: 'Jays, Magpies, Crows, and Ravens', species: 'Pied Crow', plateNumber: 548 },
+  { spotted: false, id: '225', family: 'Jays, Magpies, Crows, and Ravens', species: 'White-necked Raven', plateNumber: 550 },
+  { spotted: false, id: '226', family: 'Shrikes', species: 'Red-backed Shrike', plateNumber: 733 },
+  { spotted: false, id: '227', family: 'Shrikes', species: "Souza's Shrike", plateNumber: 734 },
+  { spotted: false, id: '228', family: 'Shrikes', species: 'Lesser Grey Shrike', plateNumber: 731 },
+  { spotted: false, id: '229', family: 'Cuckooshrikes', species: 'White-breasted Cuckooshrike', plateNumber: 539 },
+  { spotted: false, id: '230', family: 'Cuckooshrikes', species: 'Black Cuckooshrike', plateNumber: 538 },
+  { spotted: false, id: '231', family: 'Tits, Chickadees, and Titmice', species: 'Southern Black-Tit', plateNumber: 554 },
+  { spotted: false, id: '232', family: 'Martins and Swallows', species: 'Plain Martin', plateNumber: 533 },
+  { spotted: false, id: '233', family: 'Martins and Swallows', species: 'Grey-rumped Swallow', plateNumber: 531 },
+  { spotted: false, id: '234', family: 'Martins and Swallows', species: 'Barn Swallow', plateNumber: 518 },
+  { spotted: false, id: '235', family: 'Martins and Swallows', species: 'White-throated Swallow', plateNumber: 520 },
+  { spotted: false, id: '236', family: 'Martins and Swallows', species: 'Wire-tailed Swallow', plateNumber: 522 },
+  { spotted: false, id: '237', family: 'Martins and Swallows', species: 'Greater Striped Swallow', plateNumber: 526 },
+  { spotted: false, id: '238', family: 'Martins and Swallows', species: 'Lesser Striped Swallow', plateNumber: 527 },
+  { spotted: false, id: '239', family: 'Martins and Swallows', species: 'Western House-Martin', plateNumber: 530 },
+  { spotted: false, id: '240', family: 'Bulbuls', species: 'Sombre Greenbul', plateNumber: 572 },
+  { spotted: false, id: '241', family: 'Bulbuls', species: 'Yellow-bellied Greenbul', plateNumber: 574 },
+  { spotted: false, id: '242', family: 'Bulbuls', species: 'Terrestrial Brownbul', plateNumber: 569 },
+  { spotted: false, id: '243', family: 'Nicators', species: 'Eastern Nicator', plateNumber: 575 },
+  { spotted: false, id: '244', family: 'Hylias and Yellow Flycatchers', species: "Livingstone's Flycatcher", plateNumber: 707 },
+  { spotted: false, id: '245', family: 'Crombecs, Longbills, and Allies', species: 'Long-billed Crombec', plateNumber: 651 },
+  { spotted: false, id: '246', family: 'Cisticolas and Allies', species: 'Green-capped Eremomela', plateNumber: 655 },
+  { spotted: false, id: '247', family: 'Cisticolas and Allies', species: 'Burnt-necked Eremomela', plateNumber: 656 },
+  { spotted: false, id: '248', family: 'Reed Warblers and Allies', species: 'Marsh Warbler', plateNumber: 633 },
+  { spotted: false, id: '249', family: 'Reed Warblers and Allies', species: 'Lesser Swamp Warbler', plateNumber: 635 },
+  { spotted: false, id: '250', family: 'Reed Warblers and Allies', species: 'Icterine Warbler', plateNumber: 625 },
+  { spotted: false, id: '251', family: 'Leaf Warblers', species: 'Willow Warbler', plateNumber: 643 },
+  { spotted: false, id: '252', family: 'Laughingthrushes and Allies', species: "Hartlaub's Babbler", plateNumber: 562 },
+  { spotted: false, id: '253', family: 'Laughingthrushes and Allies', species: 'Arrow-marked Babbler', plateNumber: 560 },
+  { spotted: false, id: '254', family: 'Sylviid Warblers', species: 'Garden Warbler', plateNumber: 619 },
+  { spotted: false, id: '255', family: 'Cisticolas and Allies', species: 'Red-faced Cisticola', plateNumber: 674 },
+  { spotted: false, id: '256', family: 'Cisticolas and Allies', species: 'Rattling Cisticola', plateNumber: 672 },
+  { spotted: false, id: '257', family: 'Cisticolas and Allies', species: 'Luapula Cisticola', plateNumber: 0 },
+  { spotted: false, id: '258', family: 'Cisticolas and Allies', species: 'Piping Cisticola', plateNumber: 681 },
+  { spotted: false, id: '259', family: 'Cisticolas and Allies', species: 'Zitting Cisticola', plateNumber: 664 },
+  { spotted: false, id: '260', family: 'Cisticolas and Allies', species: 'Desert Cisticola', plateNumber: 665 },
+  { spotted: false, id: '261', family: 'Cisticolas and Allies', species: 'Tawny-flanked Prinia', plateNumber: 683 },
+  { spotted: false, id: '262', family: 'Cisticolas and Allies', species: 'Yellow-breasted Apalis', plateNumber: 648 },
+  { spotted: false, id: '263', family: 'Cisticolas and Allies', species: 'Green-backed Camaroptera', plateNumber: 657 },
+  { spotted: false, id: '264', family: 'Larks', species: 'Rufous-naped Lark', plateNumber: 494 },
+  { spotted: false, id: '265', family: 'Larks', species: 'Dusky Lark', plateNumber: 505 },
+  { spotted: false, id: '266', family: 'Larks', species: 'Chestnut-backed Sparrow-Lark', plateNumber: 515 },
+  { spotted: false, id: '267', family: 'Larks', species: 'Red-capped Lark', plateNumber: 507 },
+  { spotted: false, id: '268', family: 'Thrushes', species: 'Kurrichane Thrush', plateNumber: 576 },
+  { spotted: false, id: '269', family: 'Flycatchers', species: 'Southern Black-Flycatcher', plateNumber: 694 },
+  { spotted: false, id: '270', family: 'Flycatchers', species: 'Spotted Flycatcher', plateNumber: 689 },
+  { spotted: false, id: '271', family: 'Flycatchers', species: 'Ashy Flycatcher', plateNumber: 691 },
+  { spotted: false, id: '272', family: 'Flycatchers', species: 'Grey Tit-Flycatcher', plateNumber: 693 },
+  { spotted: false, id: '273', family: 'Flycatchers', species: 'Thrush Nightingale', plateNumber: 609 },
+  { spotted: false, id: '274', family: 'Flycatchers', species: 'White-browed Robin-Chat', plateNumber: 599 },
+  { spotted: false, id: '275', family: 'Flycatchers', species: 'Red-capped Robin-Chat', plateNumber: 600 },
+  { spotted: false, id: '276', family: 'Flycatchers', species: 'Collared Palm-Thrush', plateNumber: 603 },
+  { spotted: false, id: '277', family: 'Flycatchers', species: 'Bearded Scrub-Robin', plateNumber: 617 },
+  { spotted: false, id: '278', family: 'Flycatchers', species: 'White-browed Scrub-Robin', plateNumber: 613 },
+  { spotted: false, id: '279', family: 'Flycatchers', species: 'Capped Wheatear', plateNumber: 587 },
+  { spotted: false, id: '280', family: 'Flycatchers', species: "Arnot's Chat", plateNumber: 594 },
+  { spotted: false, id: '281', family: 'Thrushes', species: 'Boulder Chat', plateNumber: 610 },
+  { spotted: false, id: '282', family: 'Starlings and Mynas', species: 'Red-winged Starling', plateNumber: 769 },
+  { spotted: false, id: '283', family: 'Starlings and Mynas', species: 'Greater Blue-eared Starling', plateNumber: 765 },
+  { spotted: false, id: '284', family: 'Starlings and Mynas', species: "Meves's Starling", plateNumber: 763 },
+  { spotted: false, id: '285', family: 'Starlings and Mynas', species: 'Violet-backed Starling', plateNumber: 761 },
+  { spotted: false, id: '286', family: 'Starlings and Mynas', species: 'Wattled Starling', plateNumber: 760 },
+  { spotted: false, id: '287', family: 'Oxpeckers', species: 'Red-billed Oxpecker', plateNumber: 772 },
+  { spotted: false, id: '288', family: 'Sunbirds and Spiderhunters', species: 'Amethyst Sunbird', plateNumber: 792 },
+  { spotted: false, id: '289', family: 'Sunbirds and Spiderhunters', species: 'Scarlet-chested Sunbird', plateNumber: 791 },
+  { spotted: false, id: '290', family: 'Sunbirds and Spiderhunters', species: 'Collared Sunbird', plateNumber: 793 },
+  { spotted: false, id: '291', family: 'Sunbirds and Spiderhunters', species: 'Variable Sunbird', plateNumber: 786 },
+  { spotted: false, id: '292', family: 'Sunbirds and Spiderhunters', species: 'White-bellied Sunbird', plateNumber: 787 },
+  { spotted: false, id: '293', family: 'Sunbirds and Spiderhunters', species: "Shelley's Sunbird", plateNumber: 781 },
+  { spotted: false, id: '294', family: 'Sunbirds and Spiderhunters', species: 'Purple-banded Sunbird', plateNumber: 780 },
+  { spotted: false, id: '295', family: 'Weavers and Allies', species: 'White-browed Sparrow-Weaver', plateNumber: 799 },
+  { spotted: false, id: '296', family: 'Weavers and Allies', species: 'Lesser Masked-Weaver', plateNumber: 815 },
+  { spotted: false, id: '297', family: 'Weavers and Allies', species: 'Spectacled Weaver', plateNumber: 810 },
+  { spotted: false, id: '298', family: 'Weavers and Allies', species: "Holub's Golden-Weaver", plateNumber: 816 },
+  { spotted: false, id: '299', family: 'Weavers and Allies', species: 'Southern Masked-Weaver', plateNumber: 814 },
+  { spotted: false, id: '300', family: 'Weavers and Allies', species: 'Village Weaver', plateNumber: 811 },
+  { spotted: false, id: '301', family: 'Weavers and Allies', species: 'Red-headed Weaver', plateNumber: 819 },
+  { spotted: false, id: '302', family: 'Weavers and Allies', species: 'Red-billed Quelea', plateNumber: 821 },
+  { spotted: false, id: '303', family: 'Weavers and Allies', species: 'Southern Red Bishop', plateNumber: 824 },
+  { spotted: false, id: '304', family: 'Estrildids', species: 'Cut-throat Finch', plateNumber: 855 },
+  { spotted: false, id: '305', family: 'Estrildids', species: 'Common Waxbill', plateNumber: 846 },
+  { spotted: false, id: '306', family: 'Estrildids', species: 'Southern Cordonbleu', plateNumber: 844 },
+  { spotted: false, id: '307', family: 'Estrildids', species: 'Red-throated Twinspot', plateNumber: 839 },
+  { spotted: false, id: '308', family: 'Estrildids', species: 'Green-winged Pytilia', plateNumber: 834 },
+  { spotted: false, id: '309', family: 'Estrildids', species: 'Red-billed Firefinch', plateNumber: 842 },
+  { spotted: false, id: '310', family: 'Estrildids', species: 'Brown Firefinch', plateNumber: 843 },
+  { spotted: false, id: '311', family: 'Estrildids', species: 'African Firefinch', plateNumber: 840 },
+  { spotted: false, id: '312', family: 'Estrildids', species: "Jameson's Firefinch", plateNumber: 841 },
+  { spotted: false, id: '313', family: 'Estrildids', species: 'Bronze Mannikin', plateNumber: 857 },
+  { spotted: false, id: '314', family: 'Indigobirds and Whydahs', species: 'Pin-tailed Whydah', plateNumber: 860 },
+  { spotted: false, id: '315', family: 'Indigobirds and Whydahs', species: 'Broad-tailed Paradise-Whydah', plateNumber: 863 },
+  { spotted: false, id: '316', family: 'Indigobirds and Whydahs', species: 'Eastern Paradise-Whydah', plateNumber: 862 },
+  { spotted: false, id: '317', family: 'Indigobirds and Whydahs', species: 'Village Indigobird', plateNumber: 867 },
+  { spotted: false, id: '318', family: 'Indigobirds and Whydahs', species: 'Purple Indigobird', plateNumber: 865 },
+  { spotted: false, id: '319', family: 'Old World Sparrows', species: 'Southern Gray-headed Sparrow', plateNumber: 804 },
+  { spotted: false, id: '320', family: 'Old World Sparrows', species: 'Northern Gray-headed Sparrow', plateNumber: 804 },
+  { spotted: false, id: '321', family: 'Wagtails and Pipits', species: 'African Pied Wagtail', plateNumber: 711 },
+  { spotted: false, id: '322', family: 'Wagtails and Pipits', species: 'Western Yellow Wagtail', plateNumber: 714 },
+  { spotted: false, id: '323', family: 'Wagtails and Pipits', species: 'African Pipit', plateNumber: 716 },
+  { spotted: false, id: '324', family: 'Wagtails and Pipits', species: 'Bush Pipit', plateNumber: 723 },
+  { spotted: false, id: '325', family: 'Finches, Euphonias, and Allies', species: 'Yellow-fronted Canary', plateNumber: 869 },
+  { spotted: false, id: '326', family: 'Finches, Euphonias, and Allies', species: 'Brimstone Canary', plateNumber: 877 },
+  { spotted: false, id: '327', family: 'Old World Buntings', species: 'Cinnamon-breasted Bunting', plateNumber: 886 },
+  { spotted: false, id: '328', family: 'Old World Buntings', species: 'Golden-breasted Bunting', plateNumber: 884 },
+];
+
+function initializeFilters() {
+            const families = new Set(birds.map(b => b.family));
+            
+            const classFilter = document.getElementById('classFilter');
+            
+            families.forEach(f => {
+                const option = document.createElement('option');
+                option.value = f;
+                option.textContent = f;
+                classFilter.appendChild(option);
+            });
+        }
+
+        function filterAnimals() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedFamily = document.getElementById('classFilter').value;
+            
+            const filteredBirds = birds.filter(bird => {
+                const matchesSearch = bird.species.toLowerCase().includes(searchTerm);
+                const matchesFamily = !selectedFamily || bird.family === selectedFamily;
+                
+                return matchesSearch && matchesFamily;
+            });
+            
+            const container = document.getElementById('checklist-container');
+            const savedState = loadSavedState();
+            
+            container.innerHTML = filteredBirds.length > 0 
+                ? filteredBirds.map((bird, index) => 
+                    createChecklistItem(bird, savedState[birds.indexOf(bird)] || false)
+                  ).join('')
+                : '<div class="no-results">No birds found matching your criteria</div>';
+            
+            updateCounters();
+        }
+
+        function loadSavedState() {
+            const savedState = localStorage.getItem('birdChecklist');
+            return savedState ? JSON.parse(savedState) : {};
+        }
+
+        function saveState() {
+            const state = {};
+            document.querySelectorAll('.checklist-item').forEach((item, index) => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                state[index] = checkbox.checked;
+            });
+            localStorage.setItem('birdChecklist', JSON.stringify(state));
+        }
+
+        function updateCounters() {
+            const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            document.querySelector('.sightings-number').textContent = checkedBoxes.length;
+
+            const spottedFamilies = new Map();
+            checkedBoxes.forEach(checkbox => {
+                const item = checkbox.closest('.checklist-item');
+                const familyTag = item.querySelector('.tag-class');
+                const familyName = familyTag.textContent;
+                spottedFamilies.set(familyName, (spottedFamilies.get(familyName) || 0) + 1);
+            });
+
+            const breakdownContainer = document.getElementById('class-breakdown');
+            breakdownContainer.innerHTML = '';
+            spottedFamilies.forEach((count, familyName) => {
+                const counter = document.createElement('div');
+                counter.className = 'class-counter';
+                counter.textContent = `${familyName}: ${count}`;
+                breakdownContainer.appendChild(counter);
+            });
+        }
+
+        function createChecklistItem(bird, isChecked) {
+            return `
+                <div class="checklist-item ${isChecked ? 'completed' : ''}" onclick="toggleItem(this, event)">
+                    <div class="checkbox-container">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" ${isChecked ? 'checked' : ''}>
+                            <div class="checkbox-custom"></div>
+                        </div>
+                        <span class="spotted-text">Spotted</span>
+                    </div>
+                    <div class="checklist-content">
+                        <div class="species-info">
+                            <div class="species-text">
+                                <span class="species-name">
+                                    <a href="#" onclick="event.preventDefault(); event.stopPropagation(); showModal('${bird.id}')">${bird.species}</a> 
+                                </span>
+                                <div class="species-tags">
+                                    <span class="tag tag-class">${bird.family}</span>
+                                    <span class="tag tag-type">Plate ${bird.plateNumber}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleItem(item, event) {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+                item.classList.add('completed');
+            } else {
+                item.classList.remove('completed');
+            }
+            updateCounters();
+            saveState();
+        }
+
+        function showModal(birdId) {
+            const bird = birds.find(b => b.id === birdId);
+            if (!bird) return;
+
+            const modal = document.getElementById('animalModal');
+            modal.querySelector('.modal-title').textContent = bird.species;
+            modal.querySelector('.modal-scientific').textContent = bird.family;
+            modal.querySelector('.rating-value').textContent = bird.plateNumber;
+            
+            const tagsHtml = `
+                <span class="tag tag-class">${bird.family}</span>
+                <span class="tag tag-type">Plate ${bird.plateNumber}</span>
+            `;
+            modal.querySelector('.modal-tags').innerHTML = tagsHtml;
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('animalModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // Initialize the page
+        window.onload = function() {
+            // Simulate loading time for birds array (you can remove this in production)
+            setTimeout(() => {
+                initializeFilters();
+                
+                // Add event listeners for search and filters
+                document.getElementById('searchInput').addEventListener('input', filterAnimals);
+                document.getElementById('classFilter').addEventListener('change', filterAnimals);
+                
+                // Initial load of birds
+                const savedState = loadSavedState();
+                const container = document.getElementById('checklist-container');
+                birds.forEach((bird, index) => {
+                    container.innerHTML += createChecklistItem(bird, savedState[index] || false);
+                });
+                
+                updateCounters();
+
+                // Add export button event listeners
+                const exportBtn = document.getElementById('exportPdf');
+                exportBtn.addEventListener('click', exportPDF);
+                exportBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    exportPDF();
+                });
+
+                // Hide loader and show main content
+                const pageLoader = document.getElementById('pageLoader');
+                const mainContent = document.getElementById('mainContent');
+                
+                pageLoader.classList.add('fade-out');
+                setTimeout(() => {
+                    pageLoader.style.display = 'none';
+                    mainContent.style.display = 'block';
+                }, 500);
+            }, 1000); // 1 second delay to show the loader
+        };
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('animalModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+        async function exportPDF() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            try {
+                loadingOverlay.classList.add('active');
+                
+                // Create a new div for the PDF content
+                const pdfContent = document.createElement('div');
+                pdfContent.style.padding = '20px';
+                pdfContent.style.fontFamily = 'Arial, sans-serif';
+                pdfContent.style.fontSize = '10px';
+                pdfContent.style.lineHeight = '1.2';
+                
+                // Add the title
+                const title = document.createElement('h1');
+                title.style.textAlign = 'center';
+                title.style.marginBottom = '20px';
+                title.style.fontFamily = 'Arial, sans-serif';
+                title.style.fontSize = '18px';
+                title.style.fontWeight = 'bold';
+                title.style.pageBreakAfter = 'avoid';
+                title.style.pageBreakInside = 'avoid';
+                title.textContent = 'Lower Zambezi Bird Checklist';
+                pdfContent.appendChild(title);
+
+                // Add summary section
+                const summary = document.createElement('div');
+                summary.style.marginBottom = '20px';
+                summary.style.padding = '16px';
+                summary.style.backgroundColor = 'white';
+                summary.style.borderRadius = '8px';
+                summary.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                summary.style.pageBreakAfter = 'avoid';
+                summary.style.pageBreakInside = 'avoid';
+                summary.style.border = '1px solid #e2e8f0';
+                
+                const savedState = loadSavedState();
+                const totalSpotted = Object.values(savedState).filter(Boolean).length;
+                const totalBirds = birds.length;
+                
+                summary.innerHTML = `
+                    <div style="font-family: 'Playfair Display SC', serif; font-size: 14px; color: #1a1a1a; margin-bottom: 8px; letter-spacing: 0.5px;">
+                        <strong>Birds Spotted</strong>
+                    </div>
+                    <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #060054; margin-bottom: 8px;">
+                        ${totalSpotted}
+                    </div>
+                    <div style="font-family: 'Playfair Display', serif; font-size: 12px; color: #666;">
+                        of ${totalBirds} total species • ${new Date().toLocaleDateString()}
+                    </div>
+                `;
+                pdfContent.appendChild(summary);
+
+                // Create the table with better page break handling and bird list styling
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+                table.style.fontSize = '10px';
+                table.style.pageBreakInside = 'auto';
+                table.style.borderRadius = '8px';
+                table.style.overflow = 'hidden';
+                table.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                
+                // Add table header
+                const thead = document.createElement('thead');
+                thead.style.display = 'table-header-group';
+                thead.style.pageBreakAfter = 'avoid';
+                thead.style.pageBreakInside = 'avoid';
+                thead.innerHTML = `
+                    <tr>
+                        <th style="width: 8%; border: none; padding: 12px 8px; text-align: center; background-color: #060054; color: white; font-weight: 700; font-family: 'Playfair Display SC', serif; font-size: 11px; letter-spacing: 0.5px;">Seen</th>
+                        <th style="width: 35%; border: none; padding: 12px 8px; text-align: left; background-color: #060054; color: white; font-weight: 700; font-family: 'Playfair Display SC', serif; font-size: 11px; letter-spacing: 0.5px;">Species</th>
+                        <th style="width: 42%; border: none; padding: 12px 8px; text-align: left; background-color: #060054; color: white; font-weight: 700; font-family: 'Playfair Display SC', serif; font-size: 11px; letter-spacing: 0.5px;">Family</th>
+                        <th style="width: 15%; border: none; padding: 12px 8px; text-align: center; background-color: #060054; color: white; font-weight: 700; font-family: 'Playfair Display SC', serif; font-size: 11px; letter-spacing: 0.5px;">Plate</th>
+                    </tr>
+                `;
+                table.appendChild(thead);
+
+                // Add table body with page break controls
+                const tbody = document.createElement('tbody');
+                tbody.style.display = 'table-row-group';
+                
+                birds.forEach((bird, index) => {
+                    const tr = document.createElement('tr');
+                    tr.style.pageBreakInside = 'avoid';
+                    tr.style.pageBreakAfter = 'auto';
+                    
+                    // Add subtle zebra striping for better readability
+                    const isEven = index % 2 === 0;
+                    const backgroundColor = isEven ? '#ffffff' : '#f8fafc';
+                    
+                    tr.innerHTML = `
+                        <td style="border: none; border-bottom: 1px solid #e2e8f0; padding: 10px 8px; text-align: center; background-color: ${backgroundColor};">
+                            <div style="width: 16px; height: 16px; border: 2px solid #060054; border-radius: 6px; display: inline-block; ${savedState[index] ? 'background-color: #060054;' : ''}; transition: all 0.2s ease;"></div>
+                        </td>
+                        <td style="border: none; border-bottom: 1px solid #e2e8f0; padding: 10px 8px; text-align: left; background-color: ${backgroundColor}; font-weight: ${savedState[index] ? '400' : '600'}; font-family: 'Playfair Display', serif; color: ${savedState[index] ? '#94a3b8' : '#1a1a1a'}; text-decoration: ${savedState[index] ? 'line-through' : 'none'};">
+                            ${bird.species}
+                        </td>
+                        <td style="border: none; border-bottom: 1px solid #e2e8f0; padding: 10px 8px; text-align: left; background-color: ${backgroundColor}; font-family: 'Playfair Display', serif; color: #666;">
+                            ${bird.family}
+                        </td>
+                        <td style="border: none; border-bottom: 1px solid #e2e8f0; padding: 10px 8px; text-align: center; background-color: ${backgroundColor}; font-family: 'Playfair Display', serif; color: #ea580c; font-weight: 500;">
+                            ${bird.plateNumber}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                table.appendChild(tbody);
+                pdfContent.appendChild(table);
+
+                // Configure PDF options for better page break handling
+                const opt = {
+                    margin: [15, 15, 15, 15],
+                    filename: 'lower-zambezi-birds-checklist.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true,
+                        allowTaint: true
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: {
+                        mode: ['avoid-all', 'css', 'legacy'],
+                        before: '.page-break-before',
+                        after: '.page-break-after',
+                        avoid: '.page-break-avoid'
+                    }
+                };
+
+                // Generate PDF
+                await html2pdf()
+                    .set(opt)
+                    .from(pdfContent)
+                    .save();
+
+            } catch (error) {
+                console.error('PDF generation failed:', error);
+                alert('Failed to generate PDF. Please try again.');
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
